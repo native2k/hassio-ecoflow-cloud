@@ -4,6 +4,7 @@ from ...entities import (
     BaseSelectEntity,
     BaseSensorEntity,
     BaseSwitchEntity,
+    BaseButtonEntity,
 )
 from ...number import ChargingPowerEntity
 from ...sensor import (
@@ -652,10 +653,23 @@ class PowerOcean(BaseDevice):
             InWattsSensorEntity(client, self, "mpptPwr", const.SOLAR_IN_POWER),
             # InWattsSensorEntity(client, self, "mpptPwr", const.SOLAR_IN_POWER),
             InWattsSensorEntity(client, self, "bpPwr", const.DC_BATTERY_POWER),
-            TempSensorEntity(client, self, "bpTemp", const.BATTERY_TEMP),
+            # TempSensorEntity(client, self, "bpTemp", const.BATTERY_TEMP),
             # InWattsSensorEntity(client, self, "powInSumW", const.TOTAL_IN_POWER),
-            OutWattsSensorEntity(client, self, "sysLoadPwr", const.TOTAL_OUT_POWER),
-            InWattsSensorEntity(client, self, "sysGridPwr", const.AC_IN_POWER),
+            OutWattsSensorEntity(
+                client, self, "sysLoadPwr", const.POWEROCEAN_HOME_OUT_POWER
+            ),
+            InWattsSensorEntity(
+                client, self, "sysGridPwr", const.SMART_METER_POWER_GLOBAL
+            ),
+            InWattsSensorEntity(
+                client, self, "pcsAPhase.actPwr", const.SMART_METER_POWER_L1
+            ),
+            InWattsSensorEntity(
+                client, self, "pcsBPhase.actPwr", const.SMART_METER_POWER_L2
+            ),
+            InWattsSensorEntity(
+                client, self, "pcsCPhase.actPwr", const.SMART_METER_POWER_L3
+            ),
         ]
 
     def numbers(self, client: EcoflowApiClient) -> list[BaseNumberEntity]:
@@ -684,4 +698,7 @@ class PowerOcean(BaseDevice):
         return []
 
     def selects(self, client: EcoflowApiClient) -> list[BaseSelectEntity]:
+        return []
+
+    def buttons(self, client: EcoflowApiClient) -> list[BaseButtonEntity]:
         return []
