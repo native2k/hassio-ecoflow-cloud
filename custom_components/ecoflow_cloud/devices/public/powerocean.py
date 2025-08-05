@@ -640,71 +640,67 @@ class PowerOcean(BaseDevice):
         return [
             # Battery
             LevelSensorEntity(client, self, "bpSoc", const.BATTERY_LEVEL_SOC),
-            InWattsSensorEntity(client, self, "bpPwr", const.DC_BATTERY_POWER),
-            # Solar / Inverter
-            InWattsSolarSensorEntity(client, self, "pvInvPwr", const.SOLAR_IN_POWER),
-            InWattsSolarSensorEntity(
-                client, self, "mpptPwr", const.POWEROCEAN_MPPT_POWER
+            InWattsSensorEntity(
+                client, self, "bpPwr", const.POWEROCEAN_BATTERY_IN_POWER
             ),
+            # Solar / Inverter
+            # InWattsSolarSensorEntity(
+            #     client, self, "pvInvPwr", const.POWEROCEAN_PV_INV_POWER
+            # ),
+            InWattsSolarSensorEntity(client, self, "mpptPwr", const.SOLAR_IN_POWER),
             # Load
-            OutWattsSensorEntity(
-                client, self, "sysLoadPwr", const.POWEROCEAN_HOME_OUT_POWER
+            InWattsSensorEntity(
+                client, self, "sysLoadPwr", const.POWEROCEAN_HOME_IN_POWER
             ),
             # Grid
             InWattsSensorEntity(
-                client, self, "sysGridPwr", const.SMART_METER_POWER_GLOBAL
+                client, self, "sysGridPwr", const.POWEROCEAN_GRID_IN_POWER
             ),
             # Grid Phase A
             InWattsSensorEntity(
-                client, self, "pcsAPhase.actPwr", const.SMART_METER_POWER_L1
+                client, self, "pcsAPhase.actPwr", const.POWEROCEAN_ACTIVE_POWER_L1
             ),
             InVoltAmpSensorEntity(
                 client,
                 self,
                 "pcsAPhase.apparentPwr",
-                const.SMART_METER_APPARENT_POWER_L1,
+                const.POWEROCEAN_APPARENT_POWER_L1,
             ),
             InVoltAmpReactSensorEntity(
-                client, self, "pcsAPhase.reactPwr", const.SMART_METER_REACTIVE_POWER_L1
+                client, self, "pcsAPhase.reactPwr", const.POWEROCEAN_REACTIVE_POWER_L1
             ),
-            VoltSensorEntity(client, self, "pcsAPhase.vol", const.SMART_METER_VOLT_L1),
-            InAmpSensorEntity(
-                client, self, "pcsAPhase.vol", const.SMART_METER_IN_AMPS_L1
-            ),
+            VoltSensorEntity(client, self, "pcsAPhase.vol", const.POWEROCEAN_VOLT_L1),
+            InAmpSensorEntity(client, self, "pcsAPhase.amp", const.POWEROCEAN_AMP_L1),
             # Grid Phase B
             InWattsSensorEntity(
-                client, self, "pcsBPhase.actPwr", const.SMART_METER_POWER_L2
+                client, self, "pcsBPhase.actPwr", const.POWEROCEAN_ACTIVE_POWER_L2
             ),
             InVoltAmpSensorEntity(
                 client,
                 self,
                 "pcsBPhase.apparentPwr",
-                const.SMART_METER_APPARENT_POWER_L2,
+                const.POWEROCEAN_APPARENT_POWER_L2,
             ),
             InVoltAmpReactSensorEntity(
-                client, self, "pcsBPhase.reactPwr", const.SMART_METER_REACTIVE_POWER_L2
+                client, self, "pcsBPhase.reactPwr", const.POWEROCEAN_REACTIVE_POWER_L2
             ),
-            VoltSensorEntity(client, self, "pcsBPhase.vol", const.SMART_METER_VOLT_L2),
-            InAmpSensorEntity(
-                client, self, "pcsBPhase.vol", const.SMART_METER_IN_AMPS_L2
-            ),
+            VoltSensorEntity(client, self, "pcsBPhase.vol", const.POWEROCEAN_VOLT_L2),
+            InAmpSensorEntity(client, self, "pcsBPhase.amp", const.POWEROCEAN_AMP_L2),
             # Grid Phase C
             InWattsSensorEntity(
-                client, self, "pcsCPhase.actPwr", const.SMART_METER_POWER_L3
+                client, self, "pcsCPhase.actPwr", const.POWEROCEAN_ACTIVE_POWER_L3
             ),
             InVoltAmpSensorEntity(
                 client,
                 self,
                 "pcsCPhase.apparentPwr",
-                const.SMART_METER_APPARENT_POWER_L3,
+                const.POWEROCEAN_APPARENT_POWER_L3,
             ),
             InVoltAmpReactSensorEntity(
-                client, self, "pcsCPhase.reactPwr", const.SMART_METER_REACTIVE_POWER_L3
+                client, self, "pcsCPhase.reactPwr", const.POWEROCEAN_REACTIVE_POWER_L3
             ),
-            VoltSensorEntity(client, self, "pcsCPhase.vol", const.SMART_METER_VOLT_L3),
-            InAmpSensorEntity(
-                client, self, "pcsCPhase.vol", const.SMART_METER_IN_AMPS_L3
-            ),
+            VoltSensorEntity(client, self, "pcsCPhase.vol", const.POWEROCEAN_VOLT_L3),
+            InAmpSensorEntity(client, self, "pcsCPhase.amp", const.POWEROCEAN_AMP_L3),
         ]
 
     def numbers(self, client: EcoflowApiClient) -> list[BaseNumberEntity]:
