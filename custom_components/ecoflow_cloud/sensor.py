@@ -163,7 +163,7 @@ class VoltAmpSensorEntity(BaseSensorEntity):
 class VoltAmpReactSensorEntity(BaseSensorEntity):
     _attr_device_class = SensorDeviceClass.REACTIVE_POWER
     _attr_entity_category = EntityCategory.DIAGNOSTIC
-    _attr_native_unit_of_measurement = UnitOfApparentPower.VOLT_AMPERE_REACTIVE
+    _attr_native_unit_of_measurement = UnitOfReactivePower.VOLT_AMPERE_REACTIVE
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_value = 0
 
