@@ -22,6 +22,8 @@ from homeassistant.const import (
     UnitOfPower,
     UnitOfTemperature,
     UnitOfTime,
+    UnitOfApparentPower,
+    UnitOfReactivePower,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
@@ -148,6 +150,22 @@ class DecicelsiusSensorEntity(TempSensorEntity):
 class MilliCelsiusSensorEntity(TempSensorEntity):
     def _update_value(self, val: Any) -> bool:
         return super()._update_value(int(val) / 100)
+
+
+class VoltAmpSensorEntity(BaseSensorEntity):
+    _attr_device_class = SensorDeviceClass.APPARENT_POWER
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_native_unit_of_measurement = UnitOfApparentPower.VOLT_AMPERE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_value = 0
+
+
+class VoltAmpReactSensorEntity(BaseSensorEntity):
+    _attr_device_class = SensorDeviceClass.REACTIVE_POWER
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_native_unit_of_measurement = UnitOfApparentPower.VOLT_AMPERE_REACTIVE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_value = 0
 
 
 class VoltSensorEntity(BaseSensorEntity):
@@ -317,10 +335,29 @@ class OutWattsDcSensorEntity(WattsSensorEntity):
         return super()._update_value(int(val) / 10)
 
 
+class InVoltAmpSensorEntity(VoltAmpSensorEntity):
+    _attr_icon = "mdi:transmission-tower-import"
+
+
+class OutVoltAmpSensorEntity(VoltAmpSensorEntity):
+    _attr_icon = "mdi:transmission-tower-export"
+
+
+class InVoltAmpReactSensorEntity(VoltAmpReactSensorEntity):
+    _attr_icon = "mdi:transmission-tower-import"
+
+
+class OutVoltAmpReactSensorEntity(VoltAmpReactSensorEntity):
+    _attr_icon = "mdi:transmission-tower-export"
+
+
 class InVoltSensorEntity(VoltSensorEntity):
     _attr_icon = "mdi:transmission-tower-import"
+
+
 class OutVoltSensorEntity(VoltSensorEntity):
     _attr_icon = "mdi:transmission-tower-export"
+
 
 class InVoltSolarSensorEntity(VoltSensorEntity):
     _attr_icon = "mdi:solar-power"
@@ -479,9 +516,9 @@ class StatusSensorEntity(SensorEntity, EcoFlowAbstractEntity):
 
     def _actualize_attributes(self):
         if self._online in {_OnlineStatus.OFFLINE, _OnlineStatus.ONLINE}:
-            self._attrs[ATTR_STATUS_DATA_LAST_UPDATE] = (
-                f"< {self.offline_barrier_sec} sec"
-            )
+            self._attrs[
+                ATTR_STATUS_DATA_LAST_UPDATE
+            ] = f"< {self.offline_barrier_sec} sec"
         else:
             self._attrs[ATTR_STATUS_DATA_LAST_UPDATE] = self._last_update
 
