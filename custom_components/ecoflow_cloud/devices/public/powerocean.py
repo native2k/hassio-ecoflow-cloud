@@ -644,7 +644,7 @@ class PowerOcean(BaseDevice):
             # Battery
             LevelSensorEntity(client, self, "bpSoc", const.BATTERY_LEVEL_SOC),
             InWattsBatterySensorEntity(
-                client, self, "bpPwr", const.POWEROCEAN_BATTERY_OUT_POWER
+                client, self, "bpPwr", const.POWEROCEAN_BATTERY_IN_POWER
             ),
             # Solar / Inverter
             # InWattsSolarSensorEntity(
@@ -653,11 +653,11 @@ class PowerOcean(BaseDevice):
             InRawWattsSolarSensorEntity(client, self, "mpptPwr", const.SOLAR_IN_POWER),
             # Load
             InWattsHouseSensorEntity(
-                client, self, "sysLoadPwr", const.POWEROCEAN_HOME_OUT_POWER
+                client, self, "sysLoadPwr", const.POWEROCEAN_HOME_IN_POWER
             ),
             # Grid
             OutWattsSensorEntity(
-                client, self, "sysGridPwr", const.POWEROCEAN_GRID_IN_POWER
+                client, self, "sysGridPwr", const.POWEROCEAN_GRID_OUT_POWER
             ),
             # Phase A
             WattsSensorEntity(
