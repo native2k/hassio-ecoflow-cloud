@@ -24,7 +24,7 @@ class EcoflowMQTTClient:
         from homeassistant.components.mqtt.async_client import AsyncMQTTClient
 
         self.__client: AsyncMQTTClient = AsyncMQTTClient(
-            client_id=self.__mqtt_info.client_id,
+            # client_id=self.__mqtt_info.client_id,  # maybe fixes disconnect problem
             reconnect_on_failure=True,
             clean_session=True,
         )
