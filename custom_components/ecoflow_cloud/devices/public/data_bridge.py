@@ -29,6 +29,7 @@ def to_plain(raw_data: dict[str, Any]) -> dict[str, Any]:
         prefix = f"{raw_data['cmdFunc']}_{raw_data['cmdId']}"
 
     new_params = {}
+    flat_params = {}
 
     for section in ("param", "params"):
         if section in raw_data:
@@ -38,34 +39,30 @@ def to_plain(raw_data: dict[str, Any]) -> dict[str, Any]:
                 flat_params[full_key] = v
 
     for k, v in raw_data.items():
-        if k not in ("param", "params"):
-            new_params[f"{prefix}{k}"] = v
-
-    new_params2 = {}
-    for k, v in new_params.items():
-        new_params2[k] = v
-        if isinstance(v, dict):
-            for k2, v2 in v.items():
-                new_params2[f"{k}.{k2}"] = v2
-
-    result = {"params": new_params2, "raw_data": raw_data}
-    _LOGGER.debug(str(result))
-
-    return result
-
-
-""""
-
+        # if k not in ("param", "params"):
+        #     new_params[f"{prefix}{k}"] = v
         if k not in ("param", "params"):
             section_data = flatten_any(v, k)
             for sk, sv in section_data.items():
                 full_key = f"{prefix}.{sk}" if prefix else sk
                 flat_params[full_key] = sv
 
-    result = {"params": flat_params, "raw_data": raw_data}
-    _LOGGER.debug(result)
-    return result
+    # new_params2 = {}
+    # for k, v in new_params.items():
+    #     new_params2[k] = v
+    #     if isinstance(v, dict):
+    #         for k2, v2 in v.items():
+    #             new_params2[f"{k}.{k2}"] = v2
 
+    # result = {"params": new_params2, "raw_data": raw_data}
+    # _LOGGER.info(str(result))
+
+
+    result = {"params": flat_params, "raw_data": raw_data}
+    _LOGGER.info(result)
+    # return result
+
+    return result
 
 def flatten_any(data, parent_key="", sep="."):
     items = {}
@@ -80,4 +77,3 @@ def flatten_any(data, parent_key="", sep="."):
     else:
         items[parent_key] = data
     return items
-"""

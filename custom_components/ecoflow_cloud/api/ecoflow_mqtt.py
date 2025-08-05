@@ -22,7 +22,7 @@ class EcoflowMQTTClient:
         self.__devices: dict[str, BaseDevice] = devices
 
         from homeassistant.components.mqtt.async_client import AsyncMQTTClient
-
+        
         self.__client: AsyncMQTTClient = AsyncMQTTClient(
             client_id=self.__mqtt_info.client_id,
             reconnect_on_failure=True,

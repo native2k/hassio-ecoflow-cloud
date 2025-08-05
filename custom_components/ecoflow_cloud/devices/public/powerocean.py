@@ -722,69 +722,27 @@ class PowerOcean(BaseDevice):
             VoltSensorEntity(client, self, "pcsCPhase.vol", const.POWEROCEAN_VOLT_L3),
             AmpSensorEntity(client, self, "pcsCPhase.amp", const.POWEROCEAN_AMP_L3),
 
-
-            # from merge
-            # SolarPowerSensorEntity(client, self, "mpptPwr", "mpptPwr"),
-            # LevelSensorEntity(client, self, "bpSoc", "bpSoc"),
-            # # WattsSensorEntity(client, self, "bpPwr", "bpPwr"),
-            # SystemPowerSensorEntity(client, self, "sysLoadPwr", "sysLoadPwr"),
-            # SystemPowerSensorEntity(client, self, "sysGridPwr", "sysGridPwr"),
-            # TODO: flatten Structure?
             # String 1
-            SolarPowerSensorEntity(
-                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].pwr", "mpptPv1.pwr"
+            InRawWattsSolarSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].pwr", const.POWEROCEAN_POWER_MPPT1
             ),
             SolarAmpSensorEntity(
-                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].amp", "mpptPv1.amp"
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].amp", const.POWEROCEAN_AMP_MPPT1
             ),
             VoltSensorEntity(
-                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].vol", "mpptPv1.vol"
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].vol", const.POWEROCEAN_VOLT_MPPT1
             ),
             # String 2
-            SolarPowerSensorEntity(
-                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].pwr", "mpptPv2.pwr"
+            InRawWattsSolarSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].pwr", const.POWEROCEAN_POWER_MPPT2
             ),
             SolarAmpSensorEntity(
-                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].amp", "mpptPv2.amp"
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].amp", const.POWEROCEAN_AMP_MPPT2
             ),
             VoltSensorEntity(
-                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].vol", "mpptPv2.vol"
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].vol", const.POWEROCEAN_VOLT_MPPT2
             ),
 
-
-            VoltSensorEntity(client, self, "96_1.pcsAPhase.vol", "pcsAPhase.vol"),
-            AmpSensorEntity(client, self, "96_1.pcsAPhase.amp", "pcsAPhase.amp"),
-            WattsSensorEntity(
-                client, self, "96_1.pcsAPhase.actPwr", "pcsAPhase.actPwr"
-            ),
-            WattsSensorEntity(
-                client, self, "96_1.pcsAPhase.reactPwr", "pcsAPhase.reactPwr"
-            ),
-            WattsSensorEntity(
-                client, self, "96_1.pcsAPhase.apparentPwr", "pcsAPhase.apparentPwr"
-            ),
-            VoltSensorEntity(client, self, "96_1.pcsBPhase.vol", "pcsBPhase.vol"),
-            AmpSensorEntity(client, self, "96_1.pcsBPhase.amp", "pcsBPhase.amp"),
-            WattsSensorEntity(
-                client, self, "96_1.pcsBPhase.actPwr", "pcsBPhase.actPwr"
-            ),
-            WattsSensorEntity(
-                client, self, "96_1.pcsBPhase.reactPwr", "pcsBPhase.reactPwr"
-            ),
-            WattsSensorEntity(
-                client, self, "96_1.pcsBPhase.apparentPwr", "pcsBPhase.apparentPwr"
-            ),
-            VoltSensorEntity(client, self, "96_1.pcsCPhase.vol", "pcsCPhase.vol"),
-            AmpSensorEntity(client, self, "96_1.pcsCPhase.amp", "pcsCPhase.amp"),
-            WattsSensorEntity(
-                client, self, "96_1.pcsCPhase.actPwr", "pcsCPhase.actPwr"
-            ),
-            WattsSensorEntity(
-                client, self, "96_1.pcsCPhase.reactPwr", "pcsCPhase.reactPwr"
-            ),
-            WattsSensorEntity(
-                client, self, "96_1.pcsCPhase.apparentPwr", "pcsCPhase.apparentPwr"
-            ),
             StatusSensorEntity(client, self),
 
         ]
