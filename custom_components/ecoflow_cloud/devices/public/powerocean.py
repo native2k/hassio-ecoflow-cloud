@@ -21,6 +21,7 @@ from ...sensor import (
     VoltAmpReactSensorEntity,
     VoltSensorEntity,
     AmpSensorEntity,
+    StatusSensorEntity,
 )
 from .. import BaseDevice, const
 
@@ -704,6 +705,31 @@ class PowerOcean(BaseDevice):
             ),
             VoltSensorEntity(client, self, "pcsCPhase.vol", const.POWEROCEAN_VOLT_L3),
             AmpSensorEntity(client, self, "pcsCPhase.amp", const.POWEROCEAN_AMP_L3),
+
+
+            # String 1
+            InRawWattsSolarSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].pwr", const.POWEROCEAN_POWER_MPPT1
+            ),
+            AmpSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].amp", const.POWEROCEAN_AMP_MPPT1
+            ),
+            VoltSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].vol", const.POWEROCEAN_VOLT_MPPT1
+            ),
+            # String 2
+            InRawWattsSolarSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].pwr", const.POWEROCEAN_POWER_MPPT2
+            ),
+            AmpSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].amp", const.POWEROCEAN_AMP_MPPT2
+            ),
+            VoltSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].vol", const.POWEROCEAN_VOLT_MPPT2
+            ),
+
+            StatusSensorEntity(client, self),
+
         ]
 
     def numbers(self, client: EcoflowApiClient) -> list[BaseNumberEntity]:
