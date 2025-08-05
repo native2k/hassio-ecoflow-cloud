@@ -315,6 +315,14 @@ class InRawWattsSolarSensorEntity(InWattsSensorEntity):
     _attr_icon = "mdi:solar-power"
 
 
+class InWattsBatterySensorEntity(InWattsSensorEntity):
+    _attr_icon = "mdi:battery-charging"
+
+
+class InWattsHouseSensorEntity(InWattsSensorEntity):
+    _attr_icon = "mdi:home-import-outline"
+
+
 class InRawTotalWattsSolarSensorEntity(InRawWattsSolarSensorEntity):
     def _update_value(self, val: Any) -> bool:
         return super()._update_value(int(val) / 1000)
