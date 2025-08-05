@@ -1,13 +1,18 @@
 from ...api import EcoflowApiClient
-from ...entities import (
-    BaseNumberEntity,
-    BaseSelectEntity,
-    BaseSensorEntity,
-    BaseSwitchEntity,
-    BaseButtonEntity,
-)
 from ...number import ChargingPowerEntity
+from .. import BaseDevice, const
+
+from .data_bridge import to_plain
+
 from ...sensor import (
+    VoltSensorEntity,
+    WattsSensorEntity,
+    LevelSensorEntity,
+    AmpSensorEntity,
+    SolarPowerSensorEntity,
+    SolarAmpSensorEntity,
+    SystemPowerSensorEntity,
+    StatusSensorEntity,
     CapacitySensorEntity,
     InWattsSensorEntity,
     LevelSensorEntity,
@@ -22,7 +27,19 @@ from ...sensor import (
     VoltSensorEntity,
     AmpSensorEntity,
 )
-from .. import BaseDevice, const
+from ...entities import (
+    BaseSensorEntity,
+    BaseNumberEntity,
+    BaseSwitchEntity,
+    BaseSelectEntity,
+    BaseSwitchEntity,
+    BaseButtonEntity,
+)
+
+import logging
+from typing import Any
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class PowerOcean(BaseDevice):
@@ -704,29 +721,79 @@ class PowerOcean(BaseDevice):
             ),
             VoltSensorEntity(client, self, "pcsCPhase.vol", const.POWEROCEAN_VOLT_L3),
             AmpSensorEntity(client, self, "pcsCPhase.amp", const.POWEROCEAN_AMP_L3),
+
+
+            # from merge
+            # SolarPowerSensorEntity(client, self, "mpptPwr", "mpptPwr"),
+            # LevelSensorEntity(client, self, "bpSoc", "bpSoc"),
+            # # WattsSensorEntity(client, self, "bpPwr", "bpPwr"),
+            # SystemPowerSensorEntity(client, self, "sysLoadPwr", "sysLoadPwr"),
+            # SystemPowerSensorEntity(client, self, "sysGridPwr", "sysGridPwr"),
+            # TODO: flatten Structure?
+            # String 1
+            SolarPowerSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].pwr", "mpptPv1.pwr"
+            ),
+            SolarAmpSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].amp", "mpptPv1.amp"
+            ),
+            VoltSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].vol", "mpptPv1.vol"
+            ),
+            # String 2
+            SolarPowerSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].pwr", "mpptPv2.pwr"
+            ),
+            SolarAmpSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].amp", "mpptPv2.amp"
+            ),
+            VoltSensorEntity(
+                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].vol", "mpptPv2.vol"
+            ),
+
+
+            VoltSensorEntity(client, self, "96_1.pcsAPhase.vol", "pcsAPhase.vol"),
+            AmpSensorEntity(client, self, "96_1.pcsAPhase.amp", "pcsAPhase.amp"),
+            WattsSensorEntity(
+                client, self, "96_1.pcsAPhase.actPwr", "pcsAPhase.actPwr"
+            ),
+            WattsSensorEntity(
+                client, self, "96_1.pcsAPhase.reactPwr", "pcsAPhase.reactPwr"
+            ),
+            WattsSensorEntity(
+                client, self, "96_1.pcsAPhase.apparentPwr", "pcsAPhase.apparentPwr"
+            ),
+            VoltSensorEntity(client, self, "96_1.pcsBPhase.vol", "pcsBPhase.vol"),
+            AmpSensorEntity(client, self, "96_1.pcsBPhase.amp", "pcsBPhase.amp"),
+            WattsSensorEntity(
+                client, self, "96_1.pcsBPhase.actPwr", "pcsBPhase.actPwr"
+            ),
+            WattsSensorEntity(
+                client, self, "96_1.pcsBPhase.reactPwr", "pcsBPhase.reactPwr"
+            ),
+            WattsSensorEntity(
+                client, self, "96_1.pcsBPhase.apparentPwr", "pcsBPhase.apparentPwr"
+            ),
+            VoltSensorEntity(client, self, "96_1.pcsCPhase.vol", "pcsCPhase.vol"),
+            AmpSensorEntity(client, self, "96_1.pcsCPhase.amp", "pcsCPhase.amp"),
+            WattsSensorEntity(
+                client, self, "96_1.pcsCPhase.actPwr", "pcsCPhase.actPwr"
+            ),
+            WattsSensorEntity(
+                client, self, "96_1.pcsCPhase.reactPwr", "pcsCPhase.reactPwr"
+            ),
+            WattsSensorEntity(
+                client, self, "96_1.pcsCPhase.apparentPwr", "pcsCPhase.apparentPwr"
+            ),
+            StatusSensorEntity(client, self),
+
         ]
+
+    def flat_json(self):
+        return True
 
     def numbers(self, client: EcoflowApiClient) -> list[BaseNumberEntity]:
         return []
-        # return [
-        #     ChargingPowerEntity(
-        #         client,
-        #         self,
-        #         "cfgPlugInInfoAcInChgPowMax",
-        #         const.AC_CHARGING_POWER,
-        #         400,
-        #         2900,
-        #         lambda value: {
-        #             "sn": self.device_info.sn,
-        #             "cmdId": 17,
-        #             "dirDest": 1,
-        #             "dirSrc": 1,
-        #             "cmdFunc": 254,
-        #             "dest": 2,
-        #             "params": {"cfgPlugInInfoAcInChgPowMax": value},
-        #         },
-        #     ),
-        # ]
 
     def switches(self, client: EcoflowApiClient) -> list[BaseSwitchEntity]:
         return []
@@ -736,3 +803,12 @@ class PowerOcean(BaseDevice):
 
     def buttons(self, client: EcoflowApiClient) -> list[BaseButtonEntity]:
         return []
+
+    def _prepare_data(self, raw_data) -> dict[str, "Any"]:
+        res = super()._prepare_data(raw_data)
+        _LOGGER.info(f"_prepare_data {raw_data}")
+        res = to_plain(res)
+        return res
+
+    def _status_sensor(self, client: EcoflowApiClient) -> StatusSensorEntity:
+        return StatusSensorEntity(client, self)

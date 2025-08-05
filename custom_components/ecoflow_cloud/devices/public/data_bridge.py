@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -17,29 +18,27 @@ plain_to_status: dict[str, str] = {
 status_to_plain = dict((v, k) for (k, v) in plain_to_status.items())
 
 
-def to_plain(raw_data: dict[str, any]) -> dict[str, any]:
-    new_params = {}
+def to_plain(raw_data: dict[str, Any]) -> dict[str, Any]:
     prefix = ""
+
     if "typeCode" in raw_data:
-        prefix1 = status_to_plain.get(
-            raw_data["typeCode"], "unknown_" + raw_data["typeCode"]
+        prefix = status_to_plain.get(
+            raw_data["typeCode"], f"unknown_{raw_data['typeCode']}"
         )
-        prefix += f"{prefix1}."
     elif "cmdFunc" in raw_data and "cmdId" in raw_data:
-        prefix += f"{raw_data['cmdFunc']}_{raw_data['cmdId']}."
-    else :
-        prefix += ""
+        prefix = f"{raw_data['cmdFunc']}_{raw_data['cmdId']}"
 
-    if "param" in raw_data:
-        for k, v in raw_data["param"].items():
-            new_params[f"{prefix}{k}"] = v
+    new_params = {}
 
-    if "params" in raw_data:
-        for k, v in raw_data["params"].items():
-            new_params[f"{prefix}{k}"] = v
+    for section in ("param", "params"):
+        if section in raw_data:
+            section_data = flatten_any(raw_data[section])
+            for k, v in section_data.items():
+                full_key = f"{prefix}.{k}" if prefix else k
+                flat_params[full_key] = v
 
     for k, v in raw_data.items():
-        if k != "param" and k != "params":
+        if k not in ("param", "params"):
             new_params[f"{prefix}{k}"] = v
 
     new_params2 = {}
@@ -53,3 +52,32 @@ def to_plain(raw_data: dict[str, any]) -> dict[str, any]:
     _LOGGER.debug(str(result))
 
     return result
+
+
+""""
+
+        if k not in ("param", "params"):
+            section_data = flatten_any(v, k)
+            for sk, sv in section_data.items():
+                full_key = f"{prefix}.{sk}" if prefix else sk
+                flat_params[full_key] = sv
+
+    result = {"params": flat_params, "raw_data": raw_data}
+    _LOGGER.debug(result)
+    return result
+
+
+def flatten_any(data, parent_key="", sep="."):
+    items = {}
+    if isinstance(data, dict):
+        for k, v in data.items():
+            new_key = f"{parent_key}{sep}{k}" if parent_key else k
+            items.update(flatten_any(v, new_key, sep=sep))
+    elif isinstance(data, list):
+        for i, v in enumerate(data):
+            new_key = f"{parent_key}[{i}]"
+            items.update(flatten_any(v, new_key, sep=sep))
+    else:
+        items[parent_key] = data
+    return items
+"""
