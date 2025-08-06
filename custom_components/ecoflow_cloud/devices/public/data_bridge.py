@@ -1,4 +1,5 @@
 import logging
+import flatdict
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ def to_plain(raw_data: dict[str, any]) -> dict[str, any]:
         prefix += f"{prefix1}."
     elif "cmdFunc" in raw_data and "cmdId" in raw_data:
         prefix += f"{raw_data['cmdFunc']}_{raw_data['cmdId']}."
-    else :
+    else:
         prefix += ""
 
     if "param" in raw_data:
@@ -45,8 +46,8 @@ def to_plain(raw_data: dict[str, any]) -> dict[str, any]:
     new_params2 = {}
     for k, v in new_params.items():
         new_params2[k] = v
-        if isinstance(v, dict):
-            for k2, v2 in v.items():
+        if isinstance(v, (dict, list, tuple)):
+            for k2, v2 in flatdict.FlatterDict(v, delimiter=".").items():
                 new_params2[f"{k}.{k2}"] = v2
 
     result = {"params": new_params2, "raw_data": raw_data}

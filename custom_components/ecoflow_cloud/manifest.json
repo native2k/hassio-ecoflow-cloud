@@ -14,7 +14,8 @@
   "requirements": [
     "paho-mqtt>=2.1.0",
     "protobuf>=4.23.0",
-    "jsonpath-ng>=1.7.0"
+    "jsonpath-ng>=1.7.0",
+    "flatdict>=4.0.1"
   ],
   "version": "1.4.0-beta1"
 }
