@@ -24,9 +24,20 @@ from ...sensor import (
     StatusSensorEntity,
 )
 from .. import BaseDevice, const
+from .data_bridge import to_plain
+
+import logging
+from typing import Any
+from pprint import pformat
+import re
+
+_PREFIX_PAT = re.compile(r'^\d{2}\_\d\.')
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class PowerOcean(BaseDevice):
+
     def sensors(self, client: EcoflowApiClient) -> list[BaseSensorEntity]:
         """
         {'code': '0',
@@ -673,7 +684,8 @@ class PowerOcean(BaseDevice):
             VoltAmpReactSensorEntity(
                 client, self, "pcsAPhase.reactPwr", const.POWEROCEAN_REACTIVE_POWER_L1
             ),
-            VoltSensorEntity(client, self, "pcsAPhase.vol", const.POWEROCEAN_VOLT_L1),
+            VoltSensorEntity(client, self, "pcsAPhase.vol",
+                             const.POWEROCEAN_VOLT_L1),
             AmpSensorEntity(client, self, "pcsAPhase.amp", const.POWEROCEAN_AMP_L1),
             # Phase B
             WattsSensorEntity(
@@ -709,23 +721,23 @@ class PowerOcean(BaseDevice):
 
             # String 1
             InRawWattsSolarSensorEntity(
-                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].pwr", const.POWEROCEAN_POWER_MPPT1
+                client, self, "mpptHeartBeat.0.mpptPv.0.pwr", const.POWEROCEAN_POWER_MPPT1
             ),
             AmpSensorEntity(
-                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].amp", const.POWEROCEAN_AMP_MPPT1
+                client, self, "mpptHeartBeat.0.mpptPv.0.amp", const.POWEROCEAN_AMP_MPPT1
             ),
             VoltSensorEntity(
-                client, self, "96_1.mpptHeartBeat[0].mpptPv[0].vol", const.POWEROCEAN_VOLT_MPPT1
+                client, self, "mpptHeartBeat.0.mpptPv.0.vol", const.POWEROCEAN_VOLT_MPPT1
             ),
             # String 2
             InRawWattsSolarSensorEntity(
-                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].pwr", const.POWEROCEAN_POWER_MPPT2
+                client, self, "mpptHeartBeat.0.mpptPv.1.pwr", const.POWEROCEAN_POWER_MPPT2
             ),
             AmpSensorEntity(
-                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].amp", const.POWEROCEAN_AMP_MPPT2
+                client, self, "mpptHeartBeat.0.mpptPv.1.amp", const.POWEROCEAN_AMP_MPPT2
             ),
             VoltSensorEntity(
-                client, self, "96_1.mpptHeartBeat[0].mpptPv[1].vol", const.POWEROCEAN_VOLT_MPPT2
+                client, self, "mpptHeartBeat.0.mpptPv.1.vol", const.POWEROCEAN_VOLT_MPPT2
             ),
 
             StatusSensorEntity(client, self),
@@ -734,25 +746,6 @@ class PowerOcean(BaseDevice):
 
     def numbers(self, client: EcoflowApiClient) -> list[BaseNumberEntity]:
         return []
-        # return [
-        #     ChargingPowerEntity(
-        #         client,
-        #         self,
-        #         "cfgPlugInInfoAcInChgPowMax",
-        #         const.AC_CHARGING_POWER,
-        #         400,
-        #         2900,
-        #         lambda value: {
-        #             "sn": self.device_info.sn,
-        #             "cmdId": 17,
-        #             "dirDest": 1,
-        #             "dirSrc": 1,
-        #             "cmdFunc": 254,
-        #             "dest": 2,
-        #             "params": {"cfgPlugInInfoAcInChgPowMax": value},
-        #         },
-        #     ),
-        # ]
 
     def switches(self, client: EcoflowApiClient) -> list[BaseSwitchEntity]:
         return []
@@ -762,3 +755,29 @@ class PowerOcean(BaseDevice):
 
     def buttons(self, client: EcoflowApiClient) -> list[BaseButtonEntity]:
         return []
+
+    def _prepare_data(self, raw_data) -> dict[str, "Any"]:
+        res = super()._prepare_data(raw_data)
+        # _LOGGER.info(f"_prepare_data {raw_data}")
+        res = to_plain(res)
+
+        # remove the prefix in the params dict to make mqtt resuslt  refernces
+        # similar to the API result
+        for paramkye in ('param', 'params'):
+            update_dict = {}
+            params = res.get(paramkye)
+            if params:
+                for k, v in params.items():
+                    if _PREFIX_PAT.match(k):
+                        update_dict['.'.join(k.split('.')[1:])] = v
+                        # del params[k]
+
+                params.update(update_dict)
+
+        # _LOGGER.info("_prepare_data result")
+        # _LOGGER.info(pformat(res))
+
+        return res
+
+    def _status_sensor(self, client: EcoflowApiClient) -> StatusSensorEntity:
+        return StatusSensorEntity(client, self)
