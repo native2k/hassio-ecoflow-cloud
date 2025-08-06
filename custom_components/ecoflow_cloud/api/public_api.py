@@ -109,6 +109,10 @@ class EcoflowPublicApiClient(EcoflowApiClient):
                 raw = await self.call_api("/device/quota/all", {"sn": sn})
                 if "data" in raw:
                     self.devices[sn].data.update_data({"params": raw["data"]})
+
+                await asyncio.sleep(10)
+                await self.quota_all(sn)
+
             except Exception as exception:
                 _LOGGER.error(exception, exc_info=True)
                 _LOGGER.error("Erreur recuperation %s", sn)
