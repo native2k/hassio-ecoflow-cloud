@@ -5,6 +5,7 @@ import random
 import time
 import asyncio
 
+
 import aiohttp
 
 from ..device_data import DeviceData
@@ -12,6 +13,8 @@ from ..devices import DiagnosticDevice, EcoflowDeviceInfo
 from . import EcoflowApiClient
 
 _LOGGER = logging.getLogger(__name__)
+
+QUOTA_ALL_REFRESH_INTERVAL = 10
 
 # from FB
 # client_id limits for MQTT connections
@@ -30,6 +33,7 @@ class EcoflowPublicApiClient(EcoflowApiClient):
         self.group = group
         self.nonce = str(random.randint(10000, 1000000))
         self.timestamp = str(int(time.time() * 1000))
+        self.quota_all_tasks = {}
 
     async def login(self):
         _LOGGER.info("Requesting IoT MQTT credentials")
@@ -92,6 +96,8 @@ class EcoflowPublicApiClient(EcoflowApiClient):
         return device
 
     async def quota_all(self, device_sn: str | None):
+
+        _LOGGER.debug('quota_all was called for device "%s"', device_sn)
         if not device_sn:
             target_devices = self.devices.keys()
             # update all statuses
@@ -110,12 +116,29 @@ class EcoflowPublicApiClient(EcoflowApiClient):
                 if "data" in raw:
                     self.devices[sn].data.update_data({"params": raw["data"]})
 
-                await asyncio.sleep(10)
-                await self.quota_all(sn)
+                if sn not in self.quota_all_tasks:
+                    self.background_quota_all(sn)
 
             except Exception as exception:
                 _LOGGER.error(exception, exc_info=True)
                 _LOGGER.error("Erreur recuperation %s", sn)
+
+
+    def background_quota_all(self, device_sn: str | None):
+        async def task(device_sn: str | None):
+            while True:
+                await asyncio.sleep(QUOTA_ALL_REFRESH_INTERVAL)
+                try:
+                    await self.quota_all(device_sn)
+                except Exception as exception:
+                    _LOGGER.warning('unable to execute quota_all for device "%s": %s', device_sn, exception)
+
+        _LOGGER.debug('background_quota_all was called for device "%s"', device_sn)
+        if device_sn not in self.quota_all_tasks:
+            _LOGGER.info('Starting quota_all task for device "%s"', device_sn)
+            self.quota_all_tasks[device_sn] = asyncio.create_task(task(device_sn))
+        else:
+            _LOGGER.warning('quota_all task for device "%s" already exists', device_sn)
 
     async def call_api(self, endpoint: str, params: dict[str, str] = None) -> dict:
         self.nonce = str(random.randint(10000, 1000000))
